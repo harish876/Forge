@@ -22,7 +22,7 @@ class ConfigWrapper(configparser.ConfigParser):
         self.read(base_ini_file)
 
         env = os.environ.get("ENV", None)
-        logging.info(f"The environment variable 'environment' has the value '{env}'")
+        logging.info(f"The environment variable 'ENV' has the value '{env}'")
         if env is None:
             raise ValueError("The environment variable: 'environment' has not been set") 
         logging.info(f"The current environment is '{env}'")

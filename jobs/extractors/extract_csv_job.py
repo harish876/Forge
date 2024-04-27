@@ -1,13 +1,14 @@
 import logging
 import pandas as pd
 from jobs.job_interface import ETLJob
+import os
 
 
-class CsvExtractJob(ETLJob):
+class ExtractCsvJob(ETLJob):
 
     def __init__(self, config):
         super()
-        self.__filename =config.get("filename")
+        self.__filename = config.get('filename')
         self.delimiter = config.get("delimiter")
 
     def execute(self, data=None):
@@ -16,9 +17,8 @@ class CsvExtractJob(ETLJob):
                 return
 
             data = pd.read_csv(self.__filename)
-            for _, row in data.iterrows():
-                self.set_data_context(row)
-                self.next()
+            self.set_data_context(data.head())
+            self.next()
 
         except Exception as e:
             logging.error(e)
