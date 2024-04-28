@@ -19,7 +19,7 @@ class ETLJob(ABC):
     def next(self,data=None):
         if self.next_job:
             if data is not None:
-                self.next_job.next(data)
+                self.next_job.execute(data)
             else:
                 self.next_job.execute(self.__data)
         else:
