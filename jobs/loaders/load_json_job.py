@@ -5,4 +5,5 @@ class LoadJsonJob(ETLJob):
 		super().__init__()
 
 	def execute(self, data=None):
+		self.set_data_context('foobar')
 		self.next()
