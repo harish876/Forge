@@ -130,6 +130,7 @@ func (s *Step) GetPythonJobCode() string {
 	pythonCode += "\tdef __init__(self, config):\n"
 	pythonCode += "\t\tsuper().__init__()\n\n"
 	pythonCode += "\tdef execute(self, data=None):\n"
+	pythonCode += "\t\tself.set_data_context('foobar')\n"
 	pythonCode += "\t\tself.next()\n"
 
 	return fmt.Sprintf(pythonCode, caser.String(s.Prefix), caser.String(s.StepName))
