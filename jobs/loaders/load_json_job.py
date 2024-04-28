@@ -1,8 +1,8 @@
 from jobs.job_interface import ETLJob
 
-class ExtractJsonJob(ETLJob):
+class LoadJsonJob(ETLJob):
 	def __init__(self, config):
-		super().__init__()
+		super()
 
 	def execute(self, data=None):
-		self.next()
+		print(data)

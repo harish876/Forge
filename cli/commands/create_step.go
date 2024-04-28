@@ -56,13 +56,13 @@ func (s *Step) InitPrefixAndDirectory() {
 		s.Prefix = "extract"
 		s.Dir = "extractors"
 	case "transform", "transformer":
-		s.Prefix = "transformer"
+		s.Prefix = "transform"
 		s.Dir = "transformers"
 	case "load", "loader":
-		s.Prefix = "loader"
+		s.Prefix = "load"
 		s.Dir = "loaders"
 	case "report", "reporter":
-		s.Prefix = "reporter"
+		s.Prefix = "report"
 		s.Dir = "reporters"
 	default:
 		s.Prefix = ""
@@ -72,7 +72,7 @@ func (s *Step) InitPrefixAndDirectory() {
 
 // return the step name in the format stepType_stepName_job
 func (s *Step) GetformattedStepName() string {
-	return fmt.Sprintf("%s_%s_job", s.Prefix, s.StepName)
+	return fmt.Sprintf("%s_%s", s.Prefix, s.StepName)
 }
 
 func (s *Step) GetStepHistory() ([]Row, error) {
@@ -144,7 +144,7 @@ func (s *Step) GeneratePythonJobCode() {
 		return
 	}
 
-	filename := fmt.Sprintf("%s.py", s.GetformattedStepName())
+	filename := fmt.Sprintf("%s_job.py", s.GetformattedStepName())
 	filePath := filepath.Join(directory, filename)
 	if !TEST {
 		if _, err := os.Stat(filePath); err == nil {
@@ -210,11 +210,11 @@ func (s *Step) GetPythonFactoryCode(options []Row) string {
 	pythonCode += "from factory.factory_interface import Factory\n"
 
 	for _, option := range options {
-		pythonCode += fmt.Sprintf("from jobs.%s.%s import %s\n", s.Dir, option.Name, utils.SnakeToCamel(option.Name))
+		pythonCode += fmt.Sprintf("from jobs.%s.%s_job import %s\n", s.Dir, option.Name, utils.SnakeToCamel(option.Name+"_job"))
 	}
 
 	pythonCode += "\n"
-	pythonCode += "class Factory(Factory):\n"
+	pythonCode += fmt.Sprintf("class %sFactory(Factory):\n", utils.TitleCase(s.GetFactoryCodeFileName()))
 	pythonCode += "\tdef __init__(self):\n"
 	pythonCode += "\t\tsuper().__init__()\n\n"
 	pythonCode += "\tdef create(self, mode, **kwargs):\n"
@@ -224,7 +224,7 @@ func (s *Step) GetPythonFactoryCode(options []Row) string {
 
 	for _, option := range options {
 		pythonCode += fmt.Sprintf("\t\t\tcase \"%s\":\n", option.Name)
-		pythonCode += fmt.Sprintf("\t\t\t\treturn %s(config=merged_config)\n", utils.SnakeToCamel(option.Name))
+		pythonCode += fmt.Sprintf("\t\t\t\treturn %s(config=merged_config)\n", utils.SnakeToCamel(option.Name+"_job"))
 	}
 	pythonCode += "\t\t\tcase _:\n"
 	pythonCode += "\t\t\t\traise ValueError(\"Invalid extract type\")\n"
