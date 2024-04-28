@@ -1,16 +1,15 @@
 from factory.factory_interface import Factory
-from jobs.loaders.load_csv_job import LoadCsvJob
+from jobs.loaders.loader_json_job import LoaderJsonJob
 
+class Factory(Factory):
+	def __init__(self):
+		super().__init__()
 
-class LoaderFactory(Factory):
-    def __init__(self):
-        super()
+	def create(self, mode, **kwargs):
+		merged_config = self.get_config(mode)
 
-    def create(self, mode, **kwargs):
-        merged_config = self.get_config(mode)
-
-        match mode:
-            case "load_csv":
-                return LoadCsvJob(config = merged_config)
-            case _:
-                raise ValueError("Invalid loader type")
+		match mode:
+			case "loader_json_job":
+				return LoaderJsonJob(config=merged_config)
+			case _:
+				raise ValueError("Invalid extract type")

@@ -1,7 +1,6 @@
 import logging
 import pandas as pd
 from jobs.job_interface import ETLJob
-import os
 
 
 class ExtractCsvJob(ETLJob):
