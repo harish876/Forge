@@ -17,11 +17,17 @@ import (
 
 var (
 	DATABASE          = "./history.db"
-	JOBS_BASE_PATH    = "/Users/harishgokul/forge/jobs/"
-	FACTORY_BASE_PATH = "/Users/harishgokul/forge/factory"
+	BASE_PATH         = InitBasePath()
+	JOBS_BASE_PATH    = fmt.Sprintf("%s/jobs/", BASE_PATH)
+	FACTORY_BASE_PATH = fmt.Sprintf("%s/factory/", BASE_PATH)
 	TEST              = true
 	DB_CLIENT         *sql.DB
 )
+
+func InitBasePath() string {
+	basePath, _ := os.Getwd()
+	return basePath
+}
 
 func InitDbClient() (*sql.DB, error) {
 	if DB_CLIENT != nil {

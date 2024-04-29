@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -11,5 +12,6 @@ func GreetUser(cmd *cobra.Command, args []string) {
 	if name == "" {
 		name = "Forge User"
 	}
-	fmt.Printf("Hello, %s!\n", name)
+	dir, _ := os.Getwd()
+	fmt.Printf("Hello, I am here:  %s!\n", dir)
 }
