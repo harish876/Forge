@@ -4,7 +4,6 @@
 - [Overview](#overview)
 - [Features](#features)
 - [Design Patterns](#design-patterns)
-- [Todos and Future Plans](#todos-and-future-plans)
 
 ## Overview
 This project is aimed at providing an opiniated way of writing ETL Pipelines in a config driven way. The code follows a few design patterns in order to make the code lean and easy to write. There is an accompanying CLI which generates boilerplate code and constructs an option factory.
