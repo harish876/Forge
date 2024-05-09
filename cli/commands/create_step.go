@@ -195,18 +195,31 @@ func (s *Step) GeneratePythonFactoryCode() {
 	fileContent := s.GetPythonFactoryCode(stepHistory)
 
 	fileName := s.GetFactoryCodeFileName()
-	filePath := filepath.Join(FACTORY_BASE_PATH, fmt.Sprintf("%s_factory.py", fileName))
-	file, err := os.Create(filePath)
-	if err != nil {
-		fmt.Println("Error creating file:", err)
+	directory := FACTORY_BASE_PATH
+
+	if err := os.MkdirAll(directory, 0755); err != nil {
+		fmt.Println("Error:", err)
 		return
 	}
-	defer file.Close()
 
-	_, err = file.WriteString(fileContent)
-	if err != nil {
-		fmt.Println("Error writing to file:", err)
-		return
+	filePath := filepath.Join(FACTORY_BASE_PATH, fmt.Sprintf("%s_factory.py", fileName))
+	if _, err := os.Stat(filePath); err == nil {
+		fmt.Println("File Path is ", filePath)
+		result, _ := utils.GetCaseValues(filePath)
+		fmt.Println(result)
+	} else if os.IsNotExist(err) {
+		file, err := os.Create(filePath)
+		if err != nil {
+			fmt.Println("Error creating file:", err)
+			return
+		}
+		defer file.Close()
+
+		_, err = file.WriteString(fileContent)
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return
+		}
 	}
 
 	fmt.Printf("File %s_factory.py created/updated successfully!\n", fileName)
