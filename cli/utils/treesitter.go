@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/smacker/go-tree-sitter/python"
@@ -46,7 +47,7 @@ func extractValues(node *sitter.Node, rootType string, childType string, codeBuf
 				casePatternValue = child.Content(codeBuf)
 			}
 		}
-		*collector = append(*collector, casePatternValue)
+		*collector = append(*collector, strings.Trim(casePatternValue, "\""))
 	}
 
 	for i := 0; i < int(node.ChildCount()); i++ {

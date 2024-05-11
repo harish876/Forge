@@ -182,9 +182,24 @@ func (s *Step) GetFactoryCodeFileName() string {
 }
 
 func (s *Step) GeneratePythonFactoryCode() {
+	s.SetupHistoryTable(DB_CLIENT)
+	fileName := s.GetFactoryCodeFileName()
+	directory := FACTORY_BASE_PATH
+	filePath := filepath.Join(FACTORY_BASE_PATH, fmt.Sprintf("%s_factory.py", fileName))
+	_, err := os.Stat(filePath)
+	if err == nil {
+		steps, _ := utils.GetCaseValues(filePath)
+		//sync the current file with this history
+		for _, step := range steps {
+			if step == utils.IGNORE_CASE {
+				continue
+			}
+			s.InsertNewStep(step)
+		}
+	}
 
 	s.SetupHistoryTable(DB_CLIENT)
-	fileNeedsCodeGen := s.InsertNewStep()
+	fileNeedsCodeGen := s.InsertNewStep(s.GetformattedStepName())
 
 	if !fileNeedsCodeGen {
 		fmt.Println("File does not any updation. All steps up to date")
@@ -194,32 +209,23 @@ func (s *Step) GeneratePythonFactoryCode() {
 	stepHistory, _ := s.GetStepHistory()
 	fileContent := s.GetPythonFactoryCode(stepHistory)
 
-	fileName := s.GetFactoryCodeFileName()
-	directory := FACTORY_BASE_PATH
-
 	if err := os.MkdirAll(directory, 0755); err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	filePath := filepath.Join(FACTORY_BASE_PATH, fmt.Sprintf("%s_factory.py", fileName))
-	if _, err := os.Stat(filePath); err == nil {
-		fmt.Println("File Path is ", filePath)
-		result, _ := utils.GetCaseValues(filePath)
-		fmt.Println(result)
-	} else if os.IsNotExist(err) {
-		file, err := os.Create(filePath)
-		if err != nil {
-			fmt.Println("Error creating file:", err)
-			return
-		}
-		defer file.Close()
+	//Todo : partial update here
+	file, err := os.Create(filePath)
+	if err != nil {
+		fmt.Println("Error creating file:", err)
+		return
+	}
+	defer file.Close()
 
-		_, err = file.WriteString(fileContent)
-		if err != nil {
-			fmt.Println("Error writing to file:", err)
-			return
-		}
+	_, err = file.WriteString(fileContent)
+	if err != nil {
+		fmt.Println("Error writing to file:", err)
+		return
 	}
 
 	fmt.Printf("File %s_factory.py created/updated successfully!\n", fileName)
@@ -252,33 +258,32 @@ func (s *Step) GetPythonFactoryCode(options []Row) string {
 	return pythonCode
 }
 
-func (s *Step) InsertNewStep() bool {
-	formattedStepName := s.GetformattedStepName()
+func (s *Step) InsertNewStep(stepName string) bool {
 	stmt, err := DB_CLIENT.Prepare(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE name = ?", s.Dir))
 	if err != nil {
 		slog.Error("Error preparing statement:", err)
-		s.InsertIntoHistoryTable(DB_CLIENT)
+		s.InsertNewStep(stepName)
 		return true
 	}
 	defer stmt.Close()
 
 	var count int
-	err = stmt.QueryRow(formattedStepName).Scan(&count)
+	err = stmt.QueryRow(stepName).Scan(&count)
 	if err != nil {
 		slog.Error("Error executing query:", err)
 		return false
 	}
 
 	if count == 0 {
-		s.InsertIntoHistoryTable(DB_CLIENT)
+		s.InsertIntoHistoryTable(DB_CLIENT, stepName)
 		return true
 	}
 	return false
 
 }
 
-func (s *Step) InsertIntoHistoryTable(db *sql.DB) {
-	_, err := db.Exec(fmt.Sprintf("INSERT INTO %s (name) VALUES (?)", s.Dir), s.GetformattedStepName())
+func (s *Step) InsertIntoHistoryTable(db *sql.DB, stepName string) {
+	_, err := db.Exec(fmt.Sprintf("INSERT INTO %s (name) VALUES (?)", s.Dir), stepName)
 	if err != nil {
 		slog.Error("Error Inserting into ", s.Dir, err)
 	}
