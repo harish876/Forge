@@ -188,7 +188,7 @@ func (s *Step) GeneratePythonFactoryCode() {
 	filePath := filepath.Join(FACTORY_BASE_PATH, fmt.Sprintf("%s_factory.py", fileName))
 	_, err := os.Stat(filePath)
 	if err == nil {
-		steps, _ := utils.GetCaseValues(filePath)
+		steps, _ := utils.GetCaseValues(filePath, fmt.Sprintf("%sFactory", utils.TitleCase(s.GetFactoryCodeFileName())))
 		//sync the current file with this history
 		for _, step := range steps {
 			if step == utils.IGNORE_CASE {

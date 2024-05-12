@@ -14,43 +14,68 @@ var (
 	IGNORE_CASE = "_"
 )
 
-func GetCaseValues(filePath string) ([]string, error) {
+func GetCaseValues(filePath string, className string) ([]string, error) {
 	codeBuf := make([]byte, 10*1024*1024)
-	file, err := os.Open(filePath)
+	file, _ := os.Open(filePath)
 	n, err := file.Read(codeBuf)
+	sourceCode := codeBuf[:n]
+
 	if err != nil {
 		fmt.Println("Error:", err)
 		return nil, err
 	}
 	defer file.Close()
 
-	parser := sitter.NewParser()
-	defer parser.Close()
+	lang := python.GetLanguage()
+	node, _ := sitter.ParseCtx(context.Background(), sourceCode, lang)
 
-	language := python.GetLanguage()
-	parser.SetLanguage(language)
+	rawQuery := fmt.Sprintf(`(
+		module(
+			class_definition
+			name: ((identifier) @className (#match? @className %s))
+		   		body: (block
+					(function_definition 
+						name: ((identifier) @functionName (#match? @functionName "create"))
+						body: (block
+							(match_statement 
+								body: (block
+								alternative: (
+										case_clause(
+											case_pattern (string)
+					   				) @caseClause
+					 			)
+				   			)
+						)
+					)
+				)
+			)	 
+		)
+	)	
+	`, className)
 
-	tree, _ := parser.ParseCtx(context.Background(), nil, codeBuf[:n])
-	rootNode := tree.RootNode()
+	query := []byte(rawQuery)
 
-	result := []string{}
-	extractValues(rootNode, "case_clause", "case_pattern", codeBuf, &result)
-	return result, nil
-}
+	q, _ := sitter.NewQuery(query, lang)
+	qc := sitter.NewQueryCursor()
+	qc.Exec(q, node)
 
-func extractValues(node *sitter.Node, rootType string, childType string, codeBuf []byte, collector *[]string) {
-	if node.Type() == rootType {
-		var casePatternValue string
-		for i := 0; i < int(node.ChildCount()); i++ {
-			child := node.Child(i)
-			if child.Type() == childType {
-				casePatternValue = child.Content(codeBuf)
+	var result []string
+
+	for {
+		m, ok := qc.NextMatch()
+		if !ok {
+			break
+		}
+		// Apply predicates filtering
+		m = qc.FilterPredicates(m, sourceCode)
+		for _, c := range m.Captures {
+			if c.Node.Type() == "case_pattern" {
+				caseValue := c.Node.Content(sourceCode)
+				result = append(result, strings.Trim(caseValue, "\""))
 			}
 		}
-		*collector = append(*collector, strings.Trim(casePatternValue, "\""))
 	}
 
-	for i := 0; i < int(node.ChildCount()); i++ {
-		extractValues(node.Child(i), rootType, childType, codeBuf, collector)
-	}
+	return result, nil
+
 }
