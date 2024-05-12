@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/harish876/forge/commands"
+	"github.com/harish876/forge/cli/commands"
 	"github.com/spf13/cobra"
 )
 
