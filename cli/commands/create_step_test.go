@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/harish876/forge/utils"
+	"github.com/harish876/forge/cli/utils"
 	"github.com/stretchr/testify/assert"
 )
 
