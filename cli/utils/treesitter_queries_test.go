@@ -9,56 +9,6 @@ import (
 	"github.com/smacker/go-tree-sitter/python"
 )
 
-// func TestTreeSitterQueryJS(t *testing.T) {
-// 	var sourceCode = []byte(`
-// 	let customers = [
-//     	{ id: 0, name: 'paul', location: { address: 'oxford street' } },
-//     	{ id: 1, name: 'jeff' },
-//     	{ id: 2, name: 'mary' }
-//   	];
-//   	let customer = customers.find(cust => cust.name === 'jeff');
-//   	console.log(customer);
-// 	`)
-
-// 	parser := sitter.NewParser()
-// 	defer parser.Close()
-
-// 	language := javascript.GetLanguage()
-// 	parser.SetLanguage(language)
-// 	query := []byte(`(variable_declarator
-// 		name: (identifier) @name
-// 		value: (array (
-// 			object (
-// 				pair
-// 					key: (property_identifier) @key
-// 					value: (number) @val
-// 			)
-// 		)
-// 	  )
-// 	)`)
-
-// 	lang := javascript.GetLanguage()
-// 	node, _ := sitter.ParseCtx(context.Background(), sourceCode, lang)
-
-// 	// Execute the query
-// 	q, _ := sitter.NewQuery(query, language)
-// 	qc := sitter.NewQueryCursor()
-// 	qc.Exec(q, node)
-
-// 	for {
-// 		m, ok := qc.NextMatch()
-// 		if !ok {
-// 			break
-// 		}
-// 		// Apply predicates filtering
-// 		m = qc.FilterPredicates(m, sourceCode)
-// 		for _, c := range m.Captures {
-// 			fmt.Println(c.Node.Content(sourceCode))
-// 		}
-// 	}
-
-// }
-
 func TestTreeSitterQueryPython(t *testing.T) {
 	query := []byte(`(
 		module(

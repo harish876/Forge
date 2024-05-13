@@ -139,7 +139,7 @@ func (s *Step) GetPythonJobCode() string {
 	pythonCode += "\t\tself.set_data_context('foobar')\n"
 	pythonCode += "\t\tself.next()\n"
 
-	return fmt.Sprintf(pythonCode, caser.String(s.Prefix), caser.String(s.StepName))
+	return fmt.Sprintf(pythonCode, caser.String(s.Prefix), utils.SnakeToCamel(s.StepName))
 }
 
 func (s *Step) GeneratePythonJobCode() {
@@ -183,51 +183,31 @@ func (s *Step) GetFactoryCodeFileName() string {
 
 func (s *Step) GeneratePythonFactoryCode() {
 	s.SetupHistoryTable(DB_CLIENT)
-	fileName := s.GetFactoryCodeFileName()
-	directory := FACTORY_BASE_PATH
-	filePath := filepath.Join(FACTORY_BASE_PATH, fmt.Sprintf("%s_factory.py", fileName))
-	_, err := os.Stat(filePath)
-	if err == nil {
-		steps, _ := utils.GetCaseValues(filePath, fmt.Sprintf("%sFactory", utils.TitleCase(s.GetFactoryCodeFileName())))
-		//sync the current file with this history
-		for _, step := range steps {
-			if step == utils.IGNORE_CASE {
-				continue
-			}
-			s.InsertNewStep(step)
-		}
-	}
-
-	s.SetupHistoryTable(DB_CLIENT)
-	fileNeedsCodeGen := s.InsertNewStep(s.GetformattedStepName())
-
-	if !fileNeedsCodeGen {
-		fmt.Println("File does not any updation. All steps up to date")
-		return
-	}
-
-	stepHistory, _ := s.GetStepHistory()
-	fileContent := s.GetPythonFactoryCode(stepHistory)
-
-	if err := os.MkdirAll(directory, 0755); err != nil {
+	if err := os.MkdirAll(FACTORY_BASE_PATH, 0755); err != nil {
 		fmt.Println("Error:", err)
 		return
 	}
 
-	//Todo : partial update here
-	file, err := os.Create(filePath)
-	if err != nil {
-		fmt.Println("Error creating file:", err)
-		return
-	}
-	defer file.Close()
+	fileName := s.GetFactoryCodeFileName()
+	filePath := filepath.Join(FACTORY_BASE_PATH, fmt.Sprintf("%s_factory.py", fileName))
 
-	_, err = file.WriteString(fileContent)
-	if err != nil {
-		fmt.Println("Error writing to file:", err)
-		return
+	if _, err := os.Stat(filePath); err == nil {
+		steps, _, _ := utils.GetCaseValues(filePath, fmt.Sprintf("%sFactory", utils.TitleCase(s.GetFactoryCodeFileName())))
+		for _, step := range steps {
+			if step == utils.IGNORE_CASE {
+				continue
+			}
+			var count int
+			stmt, _ := DB_CLIENT.Prepare(fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE name = ?", s.Dir))
+			err = stmt.QueryRow(step).Scan(&count)
+			if count == 0 {
+				fmt.Println("Synced Step:", step)
+				s.InsertNewStep(step)
+			}
+		}
 	}
-
+	s.InsertNewStep(s.GetformattedStepName())
+	s.PartialRenderStep(filePath, fmt.Sprintf("%s", s.GetformattedStepName()))
 	fmt.Printf("File %s_factory.py created/updated successfully!\n", fileName)
 }
 
@@ -306,4 +286,19 @@ func CreateStep(cmd *cobra.Command, args []string) {
 	s.GeneratePythonFactoryCode()
 
 	fmt.Printf("Successfully Finished Action for %s step named %s\n", stepType, stepName)
+}
+
+func (s *Step) PartialRenderStep(filePath, stepName string) {
+	lines := []string{
+		fmt.Sprintf("from jobs.%s.%s_job import %s", s.Dir, stepName, utils.SnakeToCamel(stepName+"_Job")),
+	}
+	idx, _ := utils.GetImportStatementEndRow(filePath)
+	utils.InsertContentAtPosition(filePath, idx, lines)
+	_, nIdx, _ := utils.GetCaseValues(filePath, fmt.Sprintf("%sFactory", utils.TitleCase(s.GetFactoryCodeFileName())))
+
+	lines = []string{
+		fmt.Sprintf("\t\t\tcase \"%s\":", stepName),
+		fmt.Sprintf("\t\t\t\treturn %s(config=merged_config)", utils.SnakeToCamel(stepName+"_Job")),
+	}
+	utils.InsertContentAtPosition(filePath, nIdx, lines)
 }
