@@ -7,7 +7,7 @@
 - [Todos] (#Todos)
 
 ## Overview
-This project is aimed at providing an opiniated way of writing ETL Pipelines in a config driven way. The code follows a few design patterns in order to make the code lean and easy to write. There is an accompanying CLI which generates boilerplate code and constructs an option factory.
+This project is aimed at providing an opiniated way of writing ETL Pipelines driven by a central config store. The code follows a few design patterns in order to make the code lean and easy to write. There is an accompanying CLI which generates boilerplate code and constructs an option factory.
 
 ## Features
  1. Framework and barebone boilerplate to write any ETL code.  
@@ -26,6 +26,7 @@ This project is aimed at providing an opiniated way of writing ETL Pipelines in 
 ## Todos
 1. Add Video Documentation to this repository for better presentation
 2. Create a Project ecosystem on github and make the CLI tool and LSP tool into individual repos.
+3. Add an utility to add merge runtime CLI args with the original configs.
 
 
 
