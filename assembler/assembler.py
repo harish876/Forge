@@ -25,27 +25,26 @@ class Assembler():
 
         for step in job_steps:
             step_type = self.config_parser.get_config(step,"type")
-            match step_type:
-                case "extractor","extract":
-                    if handler_head is None:
-                        handler_head = self.extractor.create(step)
-                        handler_tail = handler_head
-                    else:
-                        extract_job = self.extractor.create(step)
-                        handler_tail.set_next_job(extract_job)
-                        handler_tail = extract_job
+            if step_type == "extractor" or step_type == "extract":
+                if handler_head is None:
+                    handler_head = self.extractor.create(step)
+                    handler_tail = handler_head
+                else:
+                    extract_job = self.extractor.create(step)
+                    handler_tail.set_next_job(extract_job)
+                    handler_tail = extract_job
 
-                case "transformer","transform":
+            elif step_type ==  "transformer" or step_type == "transform":
                     transform_job = self.transformer.create(step)
                     handler_tail.set_next_job(transform_job)
                     handler_tail = transform_job
 
-                case "loader","load":
+            elif step_type ==  "loader" or step_type == "load":
                     load_job = self.loader.create(step)
                     handler_tail.set_next_job(load_job)
                     handler_tail = load_job
 
-                case "reporter","report":
+            elif step_type ==  "reporter" or step_type == "report":
                     report_job = self.reporter.create(step)
                     handler_tail.set_next_job(report_job)
                     handler_tail = report_job
