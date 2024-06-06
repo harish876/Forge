@@ -1,5 +1,6 @@
 from factory.factory_interface import Factory
 from jobs.extractors.extract_json_job import ExtractJsonJob
+from jobs.extractors.extract_demo_job import ExtractDemoJob
 
 class ExtractorFactory(Factory):
 	def __init__(self):
@@ -12,6 +13,8 @@ class ExtractorFactory(Factory):
 
 		match mode:
 			case "extract_json":
-				return ExtractJsonJob(config=merged_config)
+				return ExtractJsonJob(config=merged_config) #existing option
+			case "extract_demo":
+				return ExtractDemoJob(config=merged_config) #cool stuff, we have the comment intact as well
 			case _:
 				raise ValueError("Invalid extract type")

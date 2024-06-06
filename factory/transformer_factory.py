@@ -1,5 +1,6 @@
 from factory.factory_interface import Factory
 from jobs.transformers.transform_json_job import TransformJsonJob
+from jobs.transformers.transform_demo_job import TransformDemoJob
 
 class TransformerFactory(Factory):
 	def __init__(self):
@@ -13,5 +14,7 @@ class TransformerFactory(Factory):
 		match mode:
 			case "transform_json":
 				return TransformJsonJob(config=merged_config)
+			case "transform_demo":
+				return TransformDemoJob(config=merged_config)
 			case _:
 				raise ValueError("Invalid extract type")

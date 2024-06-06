@@ -4,3 +4,7 @@ pycache
 .venev
 logs
 *.db
+lib
+lib64
+bin
+pyenv.cfg

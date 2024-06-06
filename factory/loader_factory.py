@@ -1,5 +1,6 @@
 from factory.factory_interface import Factory
 from jobs.loaders.load_json_job import LoadJsonJob
+from jobs.loaders.load_demo_job import LoadDemoJob
 
 class LoaderFactory(Factory):
 	def __init__(self):
@@ -13,5 +14,7 @@ class LoaderFactory(Factory):
 		match mode:
 			case "load_json":
 				return LoadJsonJob(config=merged_config)
+			case "load_demo":
+				return LoadDemoJob(config=merged_config)
 			case _:
 				raise ValueError("Invalid extract type")
