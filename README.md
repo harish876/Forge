@@ -21,7 +21,7 @@ This project is aimed at providing a framework/structure for writing ETL Pipelin
 
 ## Demo
 <video width="600" controls>
-  <source src="https://harish876.github.io/forge/docs/cli_demo.mp4" type="video/mp4">
+  <source src="https://harish876.github.io/forge/cli_demo.mp4" type="video/mp4">
   Your browser does not support the video tag.
 </video>
 
