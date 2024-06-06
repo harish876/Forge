@@ -20,6 +20,7 @@ This project is aimed at providing a framework/structure for writing ETL Pipelin
     -   An LSP that provides code completion and goto definition features for the configs belonging to a specific job.
 
 ## Demo
+[Link](https://harish876.github.io/forge/cli_demo.mp4)
 <video width="600" controls>
   <source src="https://harish876.github.io/forge/cli_demo.mp4" type="video/mp4">
   Your browser does not support the video tag.
