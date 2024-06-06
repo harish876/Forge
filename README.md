@@ -16,8 +16,8 @@ This project is aimed at providing a framework/structure for writing ETL Pipelin
  1. Framework and barebone boilerplate to write any ETL code.  
  2. Provides a neat way to use a central config store to compose ETL pipelines using just configuration.
  3. Accompanying this repository there is a
-    -   CLI tool which does boilerplate code generation for different ETL Steps.
-    -   An LSP that provides code completion and goto definition features for the configs belonging to a specific job.
+    -   [CLI tool which does boilerplate code generation for different ETL Steps](https://github.com/harish876/forge/tree/main/cli)
+    -   [An LSP that provides code completion and goto definition features for the configs belonging to a specific job](https://github.com/harish876/forge-lsp)
 
 ## Demo
 <video width="600" controls>
