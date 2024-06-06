@@ -20,7 +20,10 @@ This project is aimed at providing a framework/structure for writing ETL Pipelin
     -   An LSP that provides code completion and goto definition features for the configs belonging to a specific job.
 
 ## Demo
-  [CLI](https://github.com/harish876/forge/blob/main/cli/cli_demo.mp4)
+<video width="600" controls>
+  <source src="https://harish876.github.io/forge/docs/cli_demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
 
 ## Design Patterns
 1. Uses a Chain of Responsibility design pattern to execute each step of the ETL Pipeline.
