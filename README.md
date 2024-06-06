@@ -25,7 +25,14 @@ This project is aimed at providing a framework/structure for writing ETL Pipelin
   Your browser does not support the video tag.
 </video>
 
-If the video does not play,[click here to watch it](https://harish876.github.io/forge/cli_demo.mp4).
+If the video does not play, [click here to watch the CLI Demo](https://harish876.github.io/forge/cli_demo.mp4).
+
+<video width="600" controls>
+  <source src="https://harish876.github.io/forge/lsp_demo.mp4" type="video/mp4">
+  Your browser does not support the video tag.
+</video>
+
+If the video does not play, [click here to watch the LSP Demo](https://harish876.github.io/forge/lsp_demo.mp4).
 
 ## Design Patterns
 1. Uses a Chain of Responsibility design pattern to execute each step of the ETL Pipeline.
